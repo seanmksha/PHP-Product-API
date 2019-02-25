@@ -17,6 +17,7 @@ class Product{
     function delete(){
         $query = "DELETE * FROM $this->table_name WHERE p.id==:id";
         $stmt = $this->conn->prepare($query);
+        $this->id=$this->sanitize($this->id);
         $stmt->bindParam(":id",$this->id);
         if($stmt->execute()){
             return true;

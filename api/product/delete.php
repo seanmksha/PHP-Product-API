@@ -13,6 +13,7 @@
 
      $product = new Product($db);
      $data = json_decode(file_get_contents("php://input"));
+    
      $product->id = $data->id;
      // delete the product
     if($product->delete()){
