@@ -15,10 +15,10 @@ class Product{
         $this->conn=$db;
     }
     function delete(){
-        $query = "DELETE * FROM $this->table_name WHERE p.id==:id";
+        $query = "DELETE FROM $this->table_name WHERE id=?";
         $stmt = $this->conn->prepare($query);
         $this->id=$this->sanitize($this->id);
-        $stmt->bindParam(":id",$this->id);
+        $stmt->bindParam(1,$this->id);
         if($stmt->execute()){
             return true;
         }
@@ -29,7 +29,21 @@ class Product{
         $this->table_name p LEFT JOIN categories c ON p.category_id = c.id ORDER BY p.created DESC";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
-       
+    }
+    function search($keywords){
+        $query = "SELECT c.name as category_name, p.id, p.name, p.description, p.price, p.category_id, p.created FROM
+        $this->table_name p LEFT JOIN categories c ON p.category_id = c.id
+        WHERE
+        p.name LIKE ? OR p.description LIKE ? OR c.name LIKE ?
+        ORDER BY
+        p.created DESC";
+        $stmt=$this->conn->prepare($query);
+        $keywords=sanitize($keywords);
+        $stmt->bindParam(1,$keywords);
+        $stmt->bindParam(2,$keywords);
+        $stmt->bindParam(3,$keywords);
+        $stmt->execute();
+        return $stmt;
     }
     function readOne(){
         $query = "SELECT c.name as category_name, p.id, p.name, p.description, p.price, p.category_id, p.created
